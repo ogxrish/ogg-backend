@@ -1,0 +1,22 @@
+{
+  "name": "mycelium-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.30.1",
+    "@solana/spl-token": "^0.4.8",
+    "@solana/web3.js": "^1.95.1",
+    "bs58": "^6.0.0",
+    "cron": "^3.1.7",
+    "dotenv": "^16.4.5",
+    "ts-node": "^10.9.2"
+  }
+}
