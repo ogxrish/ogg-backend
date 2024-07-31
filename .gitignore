@@ -1,2 +1,8 @@
 node_modules
 .env
+
+# ignore python env if available
+env
+
+# do not commit images (large)
+*.png
