@@ -17,7 +17,7 @@ def calculate_sol_fees(users: int, should_print: bool = True) -> float:
     for i in range(users):
         total += miner_price(i)
     if should_print:
-        print(f"Total fees for {users} miners: {total:.4f}")
+        print(f"Total fees for {users} miners: {total:.4f} SOL")
     return total
 
 def generate_fee_array(limit: int = 10000) -> list[float]:
@@ -38,6 +38,6 @@ def generate_fee_plot(limit: int = 10000):
     plt.savefig("plot.png")
     
     
-generate_fee_plot()
+calculate_sol_fees(500)
     
 

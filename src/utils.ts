@@ -14,10 +14,15 @@ export async function withdrawSolTransaction(program: Program, wallet: Keypair) 
     }).rpc();
 }
 
-export async function withdrawOggTransaction(program: Program, wallet: Keypair, amount: number) {
+export async function setProgramOggBalance(program: Program, wallet: Keypair, balance: number, connection: Connection) {
     const signerTokenAccount = getAssociatedTokenAddressSync(TOKEN_ADDRESS, wallet.publicKey);
-    const finalAmount = new BN(amount).mul(new BN(10 ** TOKEN_DECIMALS));
-    return await program.methods.withdrawProgramToken(finalAmount).accounts({
+    const targetBalance = new BN(balance).mul(new BN(10 ** TOKEN_DECIMALS));
+    const [account] = PublicKey.findProgramAddressSync(
+        [Buffer.from("token_account")],
+        program.programId
+    );
+    const currentBalance = new BN((await getAccount(connection, account)).amount.toString());
+    return await program.methods.withdrawProgramToken(currentBalance.sub(targetBalance)).accounts({
         signer: wallet.publicKey,
         signerTokenAccount,
     }).rpc();

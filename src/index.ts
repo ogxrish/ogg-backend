@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import bs58 from "bs58";
 import { AnchorProvider, Program, Provider, Wallet } from "@coral-xyz/anchor";
-import { depositOggTransaction, swapTransaction, withdrawOggTransaction, withdrawSolTransaction } from "./utils";
+import { depositOggTransaction, setProgramOggBalance, swapTransaction, withdrawSolTransaction } from "./utils";
 const idl = require("./idl.json");
 
 dotenv.config();
@@ -22,6 +22,9 @@ async function work() {
         program = new Program(idl, provider);
 
         const balance = await connection.getBalance(admin.publicKey);
+        if (balance < LAMPORTS_PER_SOL / 10) {
+            throw new Error(`Balance of program account (${balance}) is less than 0.1 SOL`);
+        }
         console.log(`Current balance of admin account: ${balance / LAMPORTS_PER_SOL}`);
         try {
             const tx = await withdrawSolTransaction(program, admin);
@@ -54,21 +57,23 @@ function schedule() {
     setTimeout(work, randomInterval);
 }
 
+schedule();
 
-// schedule();
+async function withdraw() {
+    const connection = new Connection(process.env.RPC_URL!);
+    const wallet = new Wallet(admin);
+    provider = new AnchorProvider(connection, wallet);
+    program = new Program(idl, provider);
+    const tx = await setProgramOggBalance(program, wallet.payer, 600000000, connection);
+    console.log(`https://solscan.io/tx/${tx}`);
+}
 
-work();
+// withdraw().then(() => console.log("DONE"));
 
 
 
 
 
 
-// at set time every day
-// withdraw all possible sol from program
-// send sol to creator fees account ???
-// every random amount of time do this
-// 2. swap sol to ogg
-// 3. add ogg to account
 
 
