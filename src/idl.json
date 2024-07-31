@@ -1,5 +1,5 @@
 {
-  "address": "823yCKCDhTFobKttXS7AHghU1Lj9KqxkkFrVSiFUhG5q",
+  "address": "97PknNK44vrCKs88WpEXQwDqhRFS4SZwVVWyo2BjFstn",
   "metadata": {
     "name": "test",
     "version": "0.1.0",
@@ -50,7 +50,11 @@
           "type": "u64"
         },
         {
-          "name": "epoch_length",
+          "name": "epochs_per_day",
+          "type": "u64"
+        },
+        {
+          "name": "fee_lamports",
           "type": "u64"
         }
       ]
@@ -775,11 +779,6 @@
       ],
       "accounts": [
         {
-          "name": "signer",
-          "writable": true,
-          "signer": true
-        },
-        {
           "name": "program_authority",
           "writable": true,
           "pda": {
@@ -797,16 +796,16 @@
           }
         },
         {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
         }
       ],
-      "args": [
-        {
-          "name": "amount",
-          "type": "u64"
-        }
-      ]
+      "args": []
     },
     {
       "name": "withdraw_program_token",
@@ -967,6 +966,11 @@
       "code": 6004,
       "name": "InvalidEpoch",
       "msg": "Invalid epoch"
+    },
+    {
+      "code": 6005,
+      "name": "NoFeesToWithdraw",
+      "msg": "No fees to withdraw"
     }
   ],
   "types": [
@@ -1008,11 +1012,15 @@
             "type": "u64"
           },
           {
-            "name": "epoch_length",
+            "name": "epochs_per_day",
             "type": "u64"
           },
           {
             "name": "epoch_reward_percent",
+            "type": "u64"
+          },
+          {
+            "name": "fee_lamports",
             "type": "u64"
           }
         ]

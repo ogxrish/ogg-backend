@@ -1,56 +1,81 @@
 import { BN, Program } from "@coral-xyz/anchor";
 import { getAccount, getAssociatedTokenAddressSync } from "@solana/spl-token";
-import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, Transaction } from "@solana/web3.js";
+import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, Transaction, VersionedTransaction } from "@solana/web3.js";
+import { transactionSenderAndConfirmationWaiter } from "./transaction";
 
-
-const mint: PublicKey = process.env.NETWORK === "devnet" ? new PublicKey("EAaxwezvcFVP1sonNBQaCQNDsc924PiKMZaHNsbiiDu3") : new PublicKey("2sP9bY51NdqHGtHQfRduxUTnuPvugPAoPqtfrBR2VRCL");
-const MIN_LAMPORTS = LAMPORTS_PER_SOL / 10;
-export async function withdrawSolTransaction(program: Program, wallet: Keypair): Promise<Transaction | undefined> {
-    const connection = new Connection(process.env.RPC_URL!);
-    const [authority] = PublicKey.findProgramAddressSync(
-        [Buffer.from("auth")],
-        program.programId,
-    );
-    const amount = await connection.getBalance(authority);
-    const toWithdraw = amount - MIN_LAMPORTS;
-    if (toWithdraw > 0) {
-        return await program.methods.withdrawFees(new BN(toWithdraw)).accounts({
-            signer: wallet.publicKey,
-        }).transaction();
-    } else {
-        console.log(`${amount} not enough to withdraw`);
-    }
+export const TOKEN_ADDRESS = process.env.NETWORK === "devnet" ? new PublicKey("3TAHeRZ9pkiUU5GbPfxEJAEXhM4ARmMZTqvRdWooU54M") : new PublicKey("5gJg5ci3T7Kn5DLW4AQButdacHJtvADp7jJfNsLbRc1k");
+const TOKEN_DECIMALS = 9;
+export async function withdrawSolTransaction(program: Program, wallet: Keypair) {
+    return await program.methods.withdrawFees().accounts({
+        signer: wallet.publicKey,
+    }).rpc();
 }
 
-export async function withdrawOggTransaction(program: Program, wallet: Keypair): Promise<Transaction | undefined> {
-    const connection = new Connection(process.env.RPC_URL!);
-    const [tokenAddress] = PublicKey.findProgramAddressSync(
-        [Buffer.from("token_account")],
-        program.programId,
-    );
-    const tokenAccount = await getAccount(connection, tokenAddress);
-    const signerTokenAccount = getAssociatedTokenAddressSync(mint, wallet.publicKey);
-    if (tokenAccount.amount > 0) {
-        return await program.methods.withdrawProgramToken(new BN(tokenAccount.amount.toString())).accounts({
-            signer: wallet.publicKey,
-            signerTokenAccount,
-        }).transaction();
-    }
+export async function withdrawOggTransaction(program: Program, wallet: Keypair, amount: number) {
+    const signerTokenAccount = getAssociatedTokenAddressSync(TOKEN_ADDRESS, wallet.publicKey);
+    const finalAmount = new BN(amount).mul(new BN(10 ** TOKEN_DECIMALS));
+    return await program.methods.withdrawProgramToken(finalAmount).accounts({
+        signer: wallet.publicKey,
+        signerTokenAccount,
+    }).rpc();
 }
-export async function depositOggTransaction(program: Program, wallet: Keypair): Promise<Transaction | undefined> {
+export async function depositOggTransaction(program: Program, wallet: Keypair) {
     const connection = new Connection(process.env.RPC_URL!);
-    const signerTokenAccount = getAssociatedTokenAddressSync(mint, wallet.publicKey);
+    const signerTokenAccount = getAssociatedTokenAddressSync(TOKEN_ADDRESS, wallet.publicKey);
     const account = await getAccount(connection, signerTokenAccount);
     if (account.amount > 0) {
+        console.log(`Depositing ${(account.amount / BigInt(10 ** TOKEN_DECIMALS)).toString()} $OGG`);
         return await program.methods.depositOgg(new BN(account.amount.toString())).accounts({
             signer: wallet.publicKey,
             signerTokenAccount,
-        }).transaction();
+        }).rpc();
     }
 }
 
-export async function swapRaydiumTransaction(wallet: Keypair): Promise<Transaction | undefined> {
-    return undefined;
+const SOL = "So11111111111111111111111111111111111111112";
+export async function swapTransaction(wallet: Keypair, connection: Connection, inAmount: number) {
+    const quoteResponse = await (
+        await fetch(`https://quote-api.jup.ag/v6/quote?inputMint=${SOL}&outputMint=${TOKEN_ADDRESS}&amount=${inAmount}&slippageBps=50`)
+    ).json();
+    const { swapTransaction } = await (
+        await fetch('https://quote-api.jup.ag/v6/swap', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                quoteResponse,
+                userPublicKey: wallet.publicKey.toString(),
+                wrapAndUnwrapSol: true,
+            })
+        })
+    ).json();
+    const swapTransactionBuf = Buffer.from(swapTransaction, 'base64');
+    var transaction = VersionedTransaction.deserialize(swapTransactionBuf);
+    // sign the transaction
+    transaction.sign([wallet]);
+    const latestBlockHash = await connection.getLatestBlockhash();
+
+    // Execute the transaction
+    const rawTransaction = transaction.serialize();
+    // const txid = await connection.sendRawTransaction(rawTransaction, {
+    //     skipPreflight: true,
+    //     maxRetries: 2
+    // });
+    console.log(`Swapping ${quoteResponse.inAmount / LAMPORTS_PER_SOL} SOL for ${quoteResponse.outAmount / 10 ** 9} OGG`);
+    return await transactionSenderAndConfirmationWaiter(
+        {
+            connection,
+            serializedTransaction: rawTransaction,
+            blockhashWithExpiryBlockHeight: latestBlockHash
+        }
+    );
+    // return await connection.confirmTransaction({
+    //     blockhash: latestBlockHash.blockhash,
+    //     lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+    //     signature: txid
+    // });
 }
+
 
 

@@ -17,6 +17,10 @@
     "bs58": "^6.0.0",
     "cron": "^3.1.7",
     "dotenv": "^16.4.5",
+    "promise-retry": "^2.0.1",
     "ts-node": "^10.9.2"
+  },
+  "devDependencies": {
+    "@types/promise-retry": "^1.1.6"
   }
 }
