@@ -1,6 +1,6 @@
 
 import dotenv from "dotenv";
-import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
+import { Connection, Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import bs58 from "bs58";
 import { AnchorProvider, Program, Provider, Wallet } from "@coral-xyz/anchor";
 import { depositOggTransaction, setProgramOggBalance, swapTransaction, withdrawSolTransaction } from "./utils";
@@ -37,7 +37,8 @@ async function work() {
         const creatorFee = amount * CREATOR_FEE_PERCENT / 100;
         const buyAmount = amount - creatorFee;
         await swapTransaction(wallet.payer, connection, buyAmount);
-        console.log(`Confirmed swap`);
+        console.log(`Confirmed swap at ${(new Date()).toString()}`);
+        // link to view swaps: https://solscan.io/account/oggzGFTgRM61YmhEbgWeivVmQx8bSAdBvsPGqN3ZfxN#defiactivities
         const tx = await depositOggTransaction(program, wallet.payer);
         if (tx) {
             console.log(`Deposit ogg tx: https://solscan.io/tx/${tx}`);
@@ -57,8 +58,7 @@ function schedule() {
     setTimeout(work, randomInterval);
 }
 
-schedule();
-
+work();
 async function withdraw() {
     const connection = new Connection(process.env.RPC_URL!);
     const wallet = new Wallet(admin);
