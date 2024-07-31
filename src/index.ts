@@ -10,7 +10,8 @@ dotenv.config();
 
 const admin = Keypair.fromSecretKey(bs58.decode(process.env.WALLET!));
 
-
+const PERCENTAGE_TO_BUY: number = 5;
+const CREATOR_FEE_PERCENT: number = 0;
 let program: Program;
 let provider: Provider;
 async function work() {
@@ -29,7 +30,10 @@ async function work() {
             // console.error(e);
             console.log("No fees to withdraw");
         }
-        await swapTransaction(wallet.payer, connection, Math.floor(balance / 100));
+        const amount = Math.floor(balance * PERCENTAGE_TO_BUY / 100);
+        const creatorFee = amount * CREATOR_FEE_PERCENT / 100;
+        const buyAmount = amount - creatorFee;
+        await swapTransaction(wallet.payer, connection, buyAmount);
         console.log(`Confirmed swap`);
         const tx = await depositOggTransaction(program, wallet.payer);
         if (tx) {
