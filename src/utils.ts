@@ -25,7 +25,7 @@ export async function depositOggTransaction(program: Program, wallet: Keypair) {
     const account = await getAccount(connection, signerTokenAccount);
     if (account.amount > 0) {
         console.log(`Depositing ${(account.amount / BigInt(10 ** TOKEN_DECIMALS)).toString()} $OGG`);
-        return await program.methods.depositOgg(new BN(account.amount.toString())).accounts({
+        return await program.methods.fundProgramToken(new BN(account.amount.toString())).accounts({
             signer: wallet.publicKey,
             signerTokenAccount,
         }).rpc();
