@@ -31,7 +31,7 @@ async function work() {
             console.log("No fees to withdraw");
         }
         if (balance < LAMPORTS_PER_SOL / 10) {
-            throw new Error(`Balance of program account (${balance}) is less than 0.1 SOL`);
+            throw new Error(`Balance of program account (${balance / LAMPORTS_PER_SOL}) is less than 0.1 SOL`);
         }
         const amount = Math.floor(balance * PERCENTAGE_TO_BUY / 100);
         const creatorFee = amount * CREATOR_FEE_PERCENT / 100;
