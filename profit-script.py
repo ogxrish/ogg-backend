@@ -38,6 +38,6 @@ def generate_fee_plot(limit: int = 10000):
     plt.savefig("plot.png")
     
     
-calculate_sol_fees(500)
+calculate_sol_fees(250)
     
 
