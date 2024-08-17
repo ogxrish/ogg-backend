@@ -71,13 +71,16 @@ export async function swapTransaction(wallet: Keypair, connection: Connection, i
     //     maxRetries: 2
     // });
     console.log(`Swapping ${quoteResponse.inAmount / LAMPORTS_PER_SOL} SOL for ${quoteResponse.outAmount / 10 ** 9} OGG`);
-    return await transactionSenderAndConfirmationWaiter(
-        {
-            connection,
-            serializedTransaction: rawTransaction,
-            blockhashWithExpiryBlockHeight: latestBlockHash
-        }
-    );
+    return {
+        outAmount: quoteResponse.outAmount,
+        tx: await transactionSenderAndConfirmationWaiter(
+            {
+                connection,
+                serializedTransaction: rawTransaction,
+                blockhashWithExpiryBlockHeight: latestBlockHash
+            }
+        )
+    };
     // return await connection.confirmTransaction({
     //     blockhash: latestBlockHash.blockhash,
     //     lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
