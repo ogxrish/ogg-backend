@@ -252,7 +252,6 @@ cron.schedule('0 0 * * *', () => {
         console.error("Failed to collect data");
     }
 }, { timezone: "UTC" });
-uniqueWallets();
 app.listen(process.env.PORT || 3005, () => {
     console.log(`Server listening on ${process.env.PORT || 3005}`);
 });
