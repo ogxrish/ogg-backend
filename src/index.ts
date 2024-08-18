@@ -244,7 +244,7 @@ cron.schedule('50 23 * * *', () => {
         console.error("Failed to get unique wallets");
     }
 }, { timezone: "UTC" });
-cron.schedule('0 0 * * *', () => {
+cron.schedule('0 1 * * *', () => {
     try {
         collect();
     } catch (e) {
