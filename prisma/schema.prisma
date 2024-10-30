@@ -19,8 +19,31 @@ model GlobalData {
   longestStreak Int    @default(0)
 }
 
+model OgcGlobalData {
+  id              Int    @id @default(0)
+  index           Int    @default(0)
+  totalLocked     String @default("")
+  totalUnlockable String @default("")
+}
+
+model TopClaimedOgc {
+  id      Int    @id @default(0)
+  wallet  String
+  active String
+  claimed String
+}
+
+model IncrementalDataStepOgc {
+  id             Int    @id
+  dailyOgcReward String
+  totalReserve   String
+  totalReservers String
+  unlockableOgg  String
+  lockedOgg      String
+}
+
 model IncrementalDataStep {
-  id           Int    @id()
+  id           Int    @id
   reward       BigInt
   totalMiners  BigInt
   unclaimedOgg BigInt
