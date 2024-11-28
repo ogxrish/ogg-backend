@@ -1,5 +1,5 @@
 {
-  "address": "D3FxBBz3Kdf43AkCBZz6kSnkfjRrhGYPxFkUgjnV41Ch",
+  "address": "Bwombv4YnhcWAo7QHkqMsbem3Y88YdDStk6yn6FnNHTX",
   "metadata": {
     "name": "ogc_reserve",
     "version": "0.1.0",
@@ -434,16 +434,16 @@
       ]
     },
     {
-      "name": "deposit_ogc",
+      "name": "deposit_ogg",
       "discriminator": [
-        186,
-        85,
-        183,
-        142,
-        213,
-        155,
-        66,
-        49
+        63,
+        52,
+        6,
+        146,
+        191,
+        116,
+        7,
+        83
       ],
       "accounts": [
         {
@@ -1215,16 +1215,16 @@
       ]
     },
     {
-      "name": "withdraw_ogc",
+      "name": "withdraw_ogg",
       "discriminator": [
+        1,
+        162,
+        86,
         164,
-        47,
-        254,
-        69,
-        10,
-        130,
-        232,
-        67
+        70,
+        2,
+        154,
+        246
       ],
       "accounts": [
         {

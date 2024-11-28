@@ -13,6 +13,21 @@ export async function withdrawSolTransaction(program: Program, wallet: Keypair) 
         signer: wallet.publicKey,
     }).rpc();
 }
+export async function withdrawSolTransactionOgc(program: Program, wallet: Keypair) {
+    return await program.methods.withdrawSol().accounts({
+        signer: wallet.publicKey
+    }).rpc();
+}
+export async function depositOgcTransaction(program: Program, wallet: Keypair, tokenAddress: string) {
+    const connection = new Connection(process.env.RPC_URL!);
+    const address = new PublicKey(tokenAddress);
+    const signerTokenAccount = getAssociatedTokenAddressSync(address, wallet.publicKey);
+    const account = await getAccount(connection, signerTokenAccount);
+    return await program.methods.depositOgc(new BN(account.amount.toString())).accounts({
+        signer: wallet.publicKey,
+        signerTokenAccount,
+    }).rpc();
+}
 
 export async function setProgramOggBalance(program: Program, wallet: Keypair, balance: number, connection: Connection) {
     const signerTokenAccount = getAssociatedTokenAddressSync(TOKEN_ADDRESS, wallet.publicKey);
@@ -41,9 +56,9 @@ export async function depositOggTransaction(program: Program, wallet: Keypair) {
 }
 
 const SOL = "So11111111111111111111111111111111111111112";
-export async function swapTransaction(wallet: Keypair, connection: Connection, inAmount: number) {
+export async function swapTransaction(wallet: Keypair, connection: Connection, inAmount: number, tokenAddress: string) {
     const quoteResponse = await (
-        await fetch(`https://quote-api.jup.ag/v6/quote?inputMint=${SOL}&outputMint=${TOKEN_ADDRESS}&amount=${inAmount}&slippageBps=50`)
+        await fetch(`https://quote-api.jup.ag/v6/quote?inputMint=${SOL}&outputMint=${tokenAddress}&amount=${inAmount}&slippageBps=50`)
     ).json();
     const { swapTransaction } = await (
         await fetch('https://quote-api.jup.ag/v6/swap', {

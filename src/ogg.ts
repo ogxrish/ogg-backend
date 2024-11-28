@@ -9,7 +9,7 @@ const idl = require("./idl.json");
 dotenv.config();
 
 const admin = Keypair.fromSecretKey(bs58.decode(process.env.WALLET!));
-
+const oggAddress: string = "5gJg5ci3T7Kn5DLW4AQButdacHJtvADp7jJfNsLbRc1k";
 const PERCENTAGE_TO_BUY: number = 5;
 const CREATOR_FEE_PERCENT: number = 0;
 let program: any;
@@ -37,7 +37,7 @@ export async function work() {
         const amount = Math.floor(balance * PERCENTAGE_TO_BUY / 100);
         const creatorFee = amount * CREATOR_FEE_PERCENT / 100;
         const buyAmount = amount - creatorFee;
-        const { outAmount } = await swapTransaction(wallet.payer, connection, buyAmount);
+        const { outAmount } = await swapTransaction(wallet.payer, connection, buyAmount, oggAddress);
         oggBought += BigInt(outAmount);
         console.log(`Confirmed swap at ${(new Date()).toString()}`);
         // link to view swaps: https://solscan.io/account/oggzGFTgRM61YmhEbgWeivVmQx8bSAdBvsPGqN3ZfxN#defiactivities

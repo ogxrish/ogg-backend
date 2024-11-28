@@ -1,15 +1,18 @@
 import { Wallet, AnchorProvider, Program, BN } from "@coral-xyz/anchor";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
-import { Connection, Keypair, PublicKey } from "@solana/web3.js";
+import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import dotenv from "dotenv";
-import { prisma } from ".";
 import { getAccount } from "@solana/spl-token";
+import { prisma } from ".";
+import { depositOgcTransaction, swapTransaction, withdrawSolTransactionOgc } from "./utils";
 const idl = require("./ogc_reserve.json");
 
 dotenv.config();
-
-const connection = new Connection(process.env.DEVNET_RPC_URL);
-const keypair = Keypair.fromSecretKey(bs58.decode(process.env.OGC_WALLET));
+const ogcAddress: string = "DH5JRsRyu3RJnxXYBiZUJcwQ9Fkb562ebwUsufpZhy45";
+const PERCENTAGE_TO_BUY: number = 5;
+const CREATOR_FEE_PERCENT: number = 0;
+const connection = new Connection(process.env.RPC_URL);
+const keypair = Keypair.fromSecretKey(bs58.decode(process.env.WALLET));
 const wallet = new Wallet(keypair);
 const provider = new AnchorProvider(connection, wallet, AnchorProvider.defaultOptions());
 const program: any = new Program(idl, provider);
@@ -63,6 +66,44 @@ export async function collect() {
             }
         });
     }
+}
+export async function repurchaseOgc() {
+    try {
+        const balance = await connection.getBalance(keypair.publicKey);
+        console.log(`Current balance of admin account: ${balance / LAMPORTS_PER_SOL}`);
+        try {
+            const tx = await withdrawSolTransactionOgc(program, keypair);
+            console.log(`Withdraw tx: https://solscan.io/tx/${tx}`);
+        } catch (e) {
+            // console.error(e);
+            console.log("No fees to withdraw");
+        }
+        if (balance < LAMPORTS_PER_SOL / 10) {
+            throw new Error(`Balance of program account (${balance / LAMPORTS_PER_SOL}) is less than 0.1 SOL`);
+        }
+        const amount = Math.floor(balance * PERCENTAGE_TO_BUY / 100);
+        const creatorFee = amount * CREATOR_FEE_PERCENT / 100;
+        const buyAmount = amount - creatorFee;
+        const { outAmount } = await swapTransaction(wallet.payer, connection, buyAmount, ogcAddress);
+        console.log(`Confirmed swap at ${(new Date()).toString()}`);
+        // link to view swaps: https://solscan.io/account/oggzGFTgRM61YmhEbgWeivVmQx8bSAdBvsPGqN3ZfxN#defiactivities
+        const tx = await depositOgcTransaction(program, wallet.payer, ogcAddress);
+        console.log(`Deposited ${outAmount.toString()} $OGC`);
+        if (tx) {
+            console.log(`Deposit ogg tx: https://solscan.io/tx/${tx}`);
+        }
+    } catch (e) {
+        console.error(e);
+    } finally {
+        schedule();
+    }
+}
+const MIN_INTERVAL = 1000 * 1000; // in ms
+const MAX_INTERVAL = 5000 * 1000; // ms
+export function schedule() {
+    const randomInterval = Math.floor(Math.random() * (MAX_INTERVAL - MIN_INTERVAL + 1)) + MIN_INTERVAL;
+    console.log(`Next run in ${randomInterval / 1000} seconds`);
+    setTimeout(repurchaseOgc, randomInterval);
 }
 export async function collectDailyOgcData() {
     const [globalAccountAddress] = PublicKey.findProgramAddressSync(
