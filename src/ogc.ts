@@ -90,7 +90,7 @@ export async function repurchaseOgc() {
         const tx = await depositOgcTransaction(program, wallet.payer, ogcAddress);
         console.log(`Deposited ${outAmount.toString()} $OGC`);
         if (tx) {
-            console.log(`Deposit ogg tx: https://solscan.io/tx/${tx}`);
+            console.log(`Deposit ogc tx: https://solscan.io/tx/${tx}`);
         }
     } catch (e) {
         console.error(e);
