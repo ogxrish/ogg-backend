@@ -5,7 +5,7 @@ import { PrismaClient } from "@prisma/client";
 import express from "express";
 import cors from "cors";
 import { work, uniqueWallets, collect as collectOgg } from "./ogg";
-import { collect as collectOgc, collectDailyOgcData } from "./ogc";
+import { collect as collectOgc, collectDailyOgcData, repurchaseOgc } from "./ogc";
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 import bs58 from "bs58";
 import { Wallet, AnchorProvider, Program, BN } from "@coral-xyz/anchor";
@@ -61,17 +61,18 @@ app.get("/ogc-data", async (req, res) => {
     }
 })
 work();
-cron.schedule('50 23 * * *', async () => {
-    try {
-        await uniqueWallets();
-    } catch (e) {
-        console.error(e);
-        console.error("Failed to get unique wallets");
-    }
-}, { timezone: "UTC" });
+repurchaseOgc();
+// cron.schedule('50 23 * * *', async () => {
+//     try {
+//         await uniqueWallets();
+//     } catch (e) {
+//         console.error(e);
+//         console.error("Failed to get unique wallets");
+//     }
+// }, { timezone: "UTC" });
 cron.schedule("*/15 * * * *", async () => {
     try {
-        await collectDailyOgcData();
+        await collectOgc();
     } catch (e) {
         console.error(e);
     }
@@ -79,7 +80,7 @@ cron.schedule("*/15 * * * *", async () => {
 cron.schedule('0 1 * * *', async () => {
     try {
         // await collectOgg();
-        await collectOgc();
+        await collectDailyOgcData();
     } catch (e) {
         console.error(e);
         console.error("Failed to collect data");
