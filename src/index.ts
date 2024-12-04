@@ -60,6 +60,11 @@ app.get("/ogc-data", async (req, res) => {
         return res.status(500).json({ error: "Internal server error" });
     }
 })
+async function main() {
+    await collectOgc();
+   // await collectDailyOgcData();
+}
+main().then(() => console.log("DONE"));
 work();
 repurchaseOgc();
 // cron.schedule('50 23 * * *', async () => {

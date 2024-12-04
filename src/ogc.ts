@@ -55,6 +55,7 @@ export async function collect() {
                 id: i
             },
             create: {
+                id: i,
                 wallet: userStatsAccounts[i].account.owner.toString(),
                 claimed: userStatsAccounts[i].account.amountClaimed.toString(),
                 active: userStatsAccounts[i].account.activeReserveEpochs.toString(),
@@ -126,7 +127,7 @@ export async function collectDailyOgcData() {
             }
         }
     ]);
-    const globalData = await prisma.ogcGlobalData.findUnique({
+    const globalData = await prisma.ogcGlobalData.findUniqueOrThrow({
         where: { id: 0 }
     });
     await prisma.incrementalDataStepOgc.create({
