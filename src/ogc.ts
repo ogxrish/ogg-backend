@@ -117,8 +117,7 @@ export async function collectDailyOgcData() {
     );
     const globalAccount = await program.account.globalDataAccount.fetch(globalAccountAddress);
     const holderAccount = await getAccount(connection, holderAccountAddress);
-
-    const rewardAmount = new BN(holderAccount.amount.toString()).mul(globalAccount.rewardPercent).div(new BN(100));
+    console.log(globalAccount);
     const voteAccounts = await program.account.voteAccount.all([
         {
             memcmp: {
@@ -133,7 +132,7 @@ export async function collectDailyOgcData() {
     await prisma.incrementalDataStepOgc.create({
         data: {
             id: globalData.index + 1,
-            dailyOgcReward: rewardAmount.toString(),
+            dailyOgcReward: globalAccount.rewardAmount.toString(),
             totalReserve: holderAccount.amount.toString(),
             totalReservers: voteAccounts.length.toString(),
             unlockableOgg: globalData.totalUnlockable,

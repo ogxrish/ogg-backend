@@ -61,7 +61,7 @@ app.get("/ogc-data", async (req, res) => {
     }
 })
 async function main() {
-    await collectOgc();
+    await collectDailyOgcData();
    // await collectDailyOgcData();
 }
 main().then(() => console.log("DONE"));
