@@ -118,11 +118,12 @@ export async function collectDailyOgcData() {
     const globalAccount = await program.account.globalDataAccount.fetch(globalAccountAddress);
     const holderAccount = await getAccount(connection, holderAccountAddress);
     console.log(globalAccount);
+    console.log(globalAccount.epoch.toString());
     const voteAccounts = await program.account.voteAccount.all([
         {
             memcmp: {
-                offset: 8 + 32,
-                bytes: globalAccount.epoch.toArrayLike(Buffer, "le", 8)
+                offset: 40,
+                bytes: bs58.encode(globalAccount.epoch.toArrayLike(Buffer, "le", 8))
             }
         }
     ]);
