@@ -27,7 +27,7 @@ export async function collect() {
     let unlockable = new BN(0);
     for (const lockAccount of lockAccounts) {
         if (lockAccount.account.unlockEpoch.lte(globalAccount.epoch)) {
-            //unlockable = unlockable.add(lockAccount.account.amount);
+            unlockable = unlockable.add(lockAccount.account.amount);
         }
         total = total.add(lockAccount.account.amount);
     }
@@ -42,7 +42,7 @@ export async function collect() {
         },
         update: {
             totalLocked: total.toString(),
-            totalUnlockable: total.toString()
+            totalUnlockable: unlockable.toString()
         }
     });
     let userStatsAccounts = await program.account.userStatsAccount.all();

@@ -61,10 +61,9 @@ app.get("/ogc-data", async (req, res) => {
     }
 })
 // async function main() {
-//     await collectDailyOgcData();
-//    // await collectDailyOgcData();
+//     await collectOgc();
 // }
-// main().then(() => console.log("DONE"));
+// main()
 work();
 repurchaseOgc();
 // cron.schedule('50 23 * * *', async () => {

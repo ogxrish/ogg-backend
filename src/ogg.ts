@@ -202,3 +202,10 @@ export async function withdraw() {
     const tx = await setProgramOggBalance(program, wallet.payer, 600000000, connection);
     console.log(`https://solscan.io/tx/${tx}`);
 }
+
+
+export async function restoreDailyOgcData(n: number) {
+    for (let i = 0; i < n; i++) {
+        
+    }
+}
