@@ -196,5 +196,28 @@ export async function upload(filename: string) {
     console.log("Data uploaded successfully!");
 }
 
+export async function generateFakeData(n: number) {
+    const purchasedOggFunction = () => {
+        return Math.floor(60000 + Math.random() * 100000)
+    }
+    const rewardFunction = (n: number) => {
+        return Math.floor(600000000 - n * Math.random() * 600000)
+    }
+    const totalMiners = (n: number) => {
+        return Math.floor(110 - n / 10 * Math.random());
+    }
+    for (let i = 1; i < n; i++) {
+        await prisma.incrementalDataStep.create({
+            data: {
+                id: i,
+                reward: rewardFunction(i),
+                totalMiners: totalMiners(i),
+                purchasedOgg: purchasedOggFunction(),
+                unclaimedOgg: 0
+            }
+        })
+    }
+}
+
 
 

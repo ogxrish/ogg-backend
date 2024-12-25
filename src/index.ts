@@ -10,7 +10,7 @@ import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 import bs58 from "bs58";
 import { Wallet, AnchorProvider, Program, BN } from "@coral-xyz/anchor";
 import { getAssociatedTokenAddressSync } from "@solana/spl-token";
-import { download, upload } from "./utils";
+import { download, generateFakeData, upload } from "./utils";
 const idl_broken = require("./ogc_reserve_broken.json");
 const app = express();
 app.use(cors());
@@ -64,8 +64,18 @@ app.get("/ogc-data", async (req, res) => {
 async function main() {
     // await download();
     // await upload("data-1735061097192.json");
-    const accounts = await getVoteAccounts();
-    console.log(accounts.length);
+    // const data = await prisma.incrementalDataStep.findMany();
+    // for (const point of data) {
+    //     await prisma.incrementalDataStep.update({
+    //         where: {
+    //             id: point.id
+    //         },
+    //         data: {
+    //             purchasedOgg: BigInt(Math.floor(60000 + Math.random() * 100000)) * BigInt(10 ** 9),
+    //             reward: BigInt(Math.floor(600000000 - point.id * Math.random() * 600000)) * BigInt(10 ** 9)
+    //         }
+    //     })
+    // }
 }
 main().then(() => console.log("DONE"));
 work();
@@ -87,7 +97,7 @@ cron.schedule("*/15 * * * *", async () => {
 })
 cron.schedule('0 1 * * *', async () => {
     try {
-        // await collectOgg();
+        await collectOgg();
         await collectDailyOgcData();
     } catch (e) {
         console.error(e);
