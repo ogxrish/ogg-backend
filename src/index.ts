@@ -5,11 +5,12 @@ import { PrismaClient } from "@prisma/client";
 import express from "express";
 import cors from "cors";
 import { work, uniqueWallets, collect as collectOgg } from "./ogg";
-import { collect as collectOgc, collectDailyOgcData, repurchaseOgc } from "./ogc";
+import { collect as collectOgc, collectDailyOgcData, repurchaseOgc, getVoteAccounts } from "./ogc";
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 import bs58 from "bs58";
 import { Wallet, AnchorProvider, Program, BN } from "@coral-xyz/anchor";
 import { getAssociatedTokenAddressSync } from "@solana/spl-token";
+import { download, upload } from "./utils";
 const idl_broken = require("./ogc_reserve_broken.json");
 const app = express();
 app.use(cors());
@@ -60,10 +61,13 @@ app.get("/ogc-data", async (req, res) => {
         return res.status(500).json({ error: "Internal server error" });
     }
 })
-// async function main() {
-//     await collectOgc();
-// }
-// main()
+async function main() {
+    // await download();
+    // await upload("data-1735061097192.json");
+    const accounts = await getVoteAccounts();
+    console.log(accounts.length);
+}
+main().then(() => console.log("DONE"));
 work();
 repurchaseOgc();
 // cron.schedule('50 23 * * *', async () => {

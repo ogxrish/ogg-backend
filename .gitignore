@@ -6,3 +6,5 @@ env
 
 # do not commit images (large)
 *.png
+# do not commit backups
+data-*.json

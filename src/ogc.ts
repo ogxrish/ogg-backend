@@ -16,6 +16,10 @@ const keypair = Keypair.fromSecretKey(bs58.decode(process.env.WALLET));
 const wallet = new Wallet(keypair);
 const provider = new AnchorProvider(connection, wallet, AnchorProvider.defaultOptions());
 const program: any = new Program(idl, provider);
+export async function getVoteAccounts() {
+    const voteAccounts = await program.account.voteAccount.all();
+    return voteAccounts;
+}
 export async function collect() {
     const [globalAccountAddress] = PublicKey.findProgramAddressSync(
         [Buffer.from("global")],

@@ -3,6 +3,8 @@ import { getAccount, getAssociatedTokenAddressSync } from "@solana/spl-token";
 import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, Transaction, VersionedTransaction } from "@solana/web3.js";
 import { transactionSenderAndConfirmationWaiter } from "./transaction";
 import dotenv from "dotenv";
+import { prisma } from ".";
+import fs from "fs";
 
 dotenv.config();
 
@@ -101,6 +103,97 @@ export async function swapTransaction(wallet: Keypair, connection: Connection, i
     //     lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
     //     signature: txid
     // });
+}
+
+export async function download() {
+    const globalData = await prisma.globalData.findMany();
+    const ogcGlobalData = await prisma.ogcGlobalData.findMany();
+    const topClaimedOgc = await prisma.topClaimedOgc.findMany();
+    const incrementalDataStepOgc = await prisma.incrementalDataStepOgc.findMany();
+    const incrementalDataStep = await prisma.incrementalDataStep.findMany();
+    const streak = await prisma.streak.findMany();
+    const json = {
+        globalData,
+        ogcGlobalData,
+        topClaimedOgc,
+        incrementalDataStep,
+        incrementalDataStepOgc,
+        streak,
+    }
+    fs.writeFileSync(`data-${Date.now()}.json`, JSON.stringify(json));
+}
+
+export async function upload(filename: string) {
+    const data = fs.readFileSync(filename, "utf8");
+    const json = JSON.parse(data);
+
+    // Upload globalData
+    if (json.globalData && Array.isArray(json.globalData)) {
+        for (const item of json.globalData) {
+            await prisma.globalData.upsert({
+                where: { id: item.id }, // Assuming `id` is the unique identifier
+                update: item,
+                create: item,
+            });
+        }
+    }
+
+    // Upload ogcGlobalData
+    if (json.ogcGlobalData && Array.isArray(json.ogcGlobalData)) {
+        for (const item of json.ogcGlobalData) {
+            await prisma.ogcGlobalData.upsert({
+                where: { id: item.id },
+                update: item,
+                create: item,
+            });
+        }
+    }
+
+    // Upload topClaimedOgc
+    if (json.topClaimedOgc && Array.isArray(json.topClaimedOgc)) {
+        for (const item of json.topClaimedOgc) {
+            await prisma.topClaimedOgc.upsert({
+                where: { id: item.id },
+                update: item,
+                create: item,
+            });
+        }
+    }
+
+    // Upload incrementalDataStepOgc
+    if (json.incrementalDataStepOgc && Array.isArray(json.incrementalDataStepOgc)) {
+        for (const item of json.incrementalDataStepOgc) {
+            await prisma.incrementalDataStepOgc.upsert({
+                where: { id: item.id },
+                update: item,
+                create: item,
+            });
+        }
+    }
+
+    // Upload incrementalDataStep
+    if (json.incrementalDataStep && Array.isArray(json.incrementalDataStep)) {
+        for (const item of json.incrementalDataStep) {
+            await prisma.incrementalDataStep.upsert({
+                where: { id: item.id },
+                update: item,
+                create: item,
+            });
+        }
+    }
+
+    // Upload streak
+    if (json.streak && Array.isArray(json.streak)) {
+        for (const item of json.streak) {
+            await prisma.streak.upsert({
+                where: { wallet: item.wallet },
+                update: item,
+                create: item,
+            });
+        }
+    }
+
+    console.log("Data uploaded successfully!");
 }
 
 
