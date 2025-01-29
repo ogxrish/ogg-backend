@@ -6,7 +6,7 @@ import express from "express";
 import cors from "cors";
 import { work, collect as collectOgg, uniqueWallets } from "./ogg";
 import { collect as collectOgc, collectDailyOgcData, repurchaseOgc } from "./ogc";
-import { generateFakeData } from "./utils";
+import bs58 from "bs58";
 
 const app = express();
 app.use(cors());
@@ -58,7 +58,7 @@ app.get("/ogc-data", async (req, res) => {
     }
 })
 async function main() {
-    // await generateFakeData(183);
+    console.log(bs58.encode())
 }
 main().then(() => console.log("DONE"));
 work();
