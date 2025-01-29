@@ -174,6 +174,13 @@ export async function collect(epoch?: number) {
         const oldEpochAccount = await program.account.epochAccount.fetch(oldEpochAccountAddress);
         oggMissed = BigInt(oldEpochAccount.reward.toString()) / BigInt(oldEpochAccount.totalMiners.toString()) * BigInt(oldMineAccounts.length);
     }
+    console.log({
+        id: prevEpoch.toNumber(),
+        reward: BigInt(epochAccount.reward.toString()),
+        totalMiners: BigInt(epochAccount.totalMiners.toString()),
+        unclaimedOgg: oggMissed,
+        purchasedOgg: oggBought
+    })
     const data = await prisma.incrementalDataStep.create({
         data: {
             id: prevEpoch.toNumber(),
@@ -206,6 +213,6 @@ export async function withdraw() {
 
 export async function restoreDailyOgcData(n: number) {
     for (let i = 0; i < n; i++) {
-        
+
     }
 }

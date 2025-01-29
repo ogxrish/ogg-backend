@@ -197,23 +197,28 @@ export async function upload(filename: string) {
 }
 
 export async function generateFakeData(n: number) {
-    const purchasedOggFunction = () => {
-        return Math.floor(60000 + Math.random() * 100000)
-    }
-    const rewardFunction = (n: number) => {
-        return Math.floor(600000000 - n * Math.random() * 600000)
-    }
-    const totalMiners = (n: number) => {
-        return Math.floor(110 - n / 10 * Math.random());
-    }
-    for (let i = 1; i < n; i++) {
+    await prisma.incrementalDataStep.deleteMany();
+    let reward = BigInt(600000000) * BigInt(10 ** 9);
+    let totalMiners = 105;
+    let unclaimedOgg = BigInt(0);
+    for (let i = 0; i < n; i++) {
+        const repurchased = BigInt(Math.floor(60000 + Math.random() * 50000)) * BigInt(10 ** 9);
+        reward -= (reward / BigInt(100)) + repurchased;
+        totalMiners -= 3 - Math.trunc(Math.random() * 5);
+        if (totalMiners <= 20) {
+            totalMiners += Math.floor(Math.random() * 4)
+        }
+        if (i > 10) {
+            let newValue = unclaimedOgg + BigInt(Math.round(-5000 + 15000 * Math.random()))
+            unclaimedOgg = newValue < 0 ? BigInt(0) : newValue;
+        }
         await prisma.incrementalDataStep.create({
             data: {
                 id: i,
-                reward: rewardFunction(i),
-                totalMiners: totalMiners(i),
-                purchasedOgg: purchasedOggFunction(),
-                unclaimedOgg: 0
+                reward,
+                totalMiners: BigInt(totalMiners),
+                purchasedOgg: repurchased,
+                unclaimedOgg,
             }
         })
     }
