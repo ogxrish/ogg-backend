@@ -7,6 +7,7 @@ import cors from "cors";
 import { work, collect as collectOgg, uniqueWallets } from "./ogg";
 import { collect as collectOgc, collectDailyOgcData, repurchaseOgc } from "./ogc";
 import bs58 from "bs58";
+import { Keypair } from "@solana/web3.js";
 
 const app = express();
 app.use(cors());
@@ -58,7 +59,7 @@ app.get("/ogc-data", async (req, res) => {
     }
 })
 async function main() {
-    console.log(bs58.encode())
+    console.log(bs58.encode(Keypair.generate().secretKey));
 }
 main().then(() => console.log("DONE"));
 work();

@@ -8,7 +8,7 @@ const idl = require("./idl.json");
 
 dotenv.config();
 
-const admin = Keypair.fromSecretKey(bs58.decode(process.env.WALLET!));
+const admin = Keypair.fromSecretKey(bs58.decode(process.env.OGG_WALLET!));
 const oggAddress: string = "5gJg5ci3T7Kn5DLW4AQButdacHJtvADp7jJfNsLbRc1k";
 const PERCENTAGE_TO_BUY: number = 5;
 const CREATOR_FEE_PERCENT: number = 0;
@@ -210,9 +210,3 @@ export async function withdraw() {
     console.log(`https://solscan.io/tx/${tx}`);
 }
 
-
-export async function restoreDailyOgcData(n: number) {
-    for (let i = 0; i < n; i++) {
-
-    }
-}
