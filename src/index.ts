@@ -4,7 +4,7 @@ import cron from "node-cron";
 import { PrismaClient } from "@prisma/client";
 import express from "express";
 import cors from "cors";
-import { work, collect as collectOgg, uniqueWallets } from "./ogg";
+import { collect as collectOgg, repurchaseOgg, uniqueWallets } from "./ogg";
 import { collect as collectOgc, collectDailyOgcData, repurchaseOgc } from "./ogc";
 import bs58 from "bs58";
 import { Keypair } from "@solana/web3.js";
@@ -63,7 +63,26 @@ async function main() {
 }
 main().then(() => console.log("DONE"));
 work();
-repurchaseOgc();
+async function work() {
+    try {
+        await repurchaseOgc();
+    } catch (e) {
+        console.error(e);
+    }
+    try {
+        await repurchaseOgg();
+    } catch (e) {
+        console.error(e);
+    }
+    schedule(work);
+}
+const MIN_INTERVAL = 1000 * 1000; // in ms
+const MAX_INTERVAL = 5000 * 1000; // ms
+export function schedule(f: () => any) {
+    const randomInterval = Math.floor(Math.random() * (MAX_INTERVAL - MIN_INTERVAL + 1)) + MIN_INTERVAL;
+    console.log(`Next run in ${randomInterval / 1000} seconds`);
+    setTimeout(f, randomInterval);
+}
 cron.schedule('50 23 * * *', async () => {
     try {
         await uniqueWallets();
