@@ -59,7 +59,7 @@ app.get("/ogc-data", async (req, res) => {
     }
 })
 async function main() {
-    console.log(bs58.encode(Keypair.generate().secretKey));
+    // console.log(bs58.encode(Keypair.generate().secretKey));
 }
 main().then(() => console.log("DONE"));
 work();
