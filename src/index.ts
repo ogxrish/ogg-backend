@@ -52,6 +52,7 @@ app.get("/ogc-data", async (req, res) => {
             leaderboard,
             totalLocked: global?.totalLocked || "0",
             totalUnlockable: global?.totalUnlockable || "0",
+            lastWinningReserves: global?.lastWinningReserves || []
         });
     } catch (e) {
         console.error(e);
