@@ -20,16 +20,17 @@ model GlobalData {
 }
 
 model OgcGlobalData {
-  id              Int    @id @default(0)
-  index           Int    @default(0)
-  totalLocked     String @default("")
-  totalUnlockable String @default("")
+  id                  Int    @id @default(0)
+  index               Int    @default(0)
+  totalLocked         String @default("")
+  totalUnlockable     String @default("")
+  lastWinningReserves Int[]
 }
 
 model TopClaimedOgc {
   id      Int    @id @default(0)
   wallet  String
-  active String
+  active  String
   claimed String
 }
 

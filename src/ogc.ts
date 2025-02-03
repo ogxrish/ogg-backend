@@ -99,6 +99,36 @@ export async function repurchaseOgc() {
         console.log(`Deposit ogc tx: https://solscan.io/tx/${tx}`);
     }
 }
+export async function test() {
+    const [globalAccountAddress] = PublicKey.findProgramAddressSync(
+        [Buffer.from("global")],
+        program.programId,
+    );
+    const globalAccount = await program.account.globalDataAccount.fetch(globalAccountAddress);
+    const [epochAccountAddress] = PublicKey.findProgramAddressSync(
+        [Buffer.from("epoch"), globalAccount.epoch.toArrayLike(Buffer, "le", 8)],
+        program.programId
+    );
+    const epochAccount = await program.account.epochAccount.fetch(epochAccountAddress);
+    let max = new BN(0);
+    let secondMax = new BN(0);
+    let maxIndex = 0;
+    let secondMaxIndex = 0;
+    for (let i = 0; i < epochAccount.fields.length; i++) {
+        const bn = epochAccount.fields[i];
+        if (bn.gt(max)) {
+            secondMax = max;
+            secondMaxIndex = maxIndex;
+            max = bn;
+            maxIndex = i;
+        } else if (bn.gt(secondMax)) {
+            secondMax = bn;
+            secondMaxIndex = i;
+        }
+    }
+    console.log(secondMaxIndex);
+    console.log(epochAccount.fields.map((field: any) => field.toString()))
+}
 export async function collectDailyOgcData() {
     const [globalAccountAddress] = PublicKey.findProgramAddressSync(
         [Buffer.from("global")],
@@ -109,9 +139,31 @@ export async function collectDailyOgcData() {
         program.programId
     );
     const globalAccount = await program.account.globalDataAccount.fetch(globalAccountAddress);
+    const [epochAccountAddress] = PublicKey.findProgramAddressSync(
+        [Buffer.from("epoch"), globalAccount.epoch.toArrayLike(Buffer, "le", 8)],
+        program.programId
+    );
+    const epochAccount = await program.account.epochAccount.fetch(epochAccountAddress);
+    let max = new BN(0);
+    let secondMax = new BN(0);
+    let maxIndex = 0;
+    let secondMaxIndex = 0;
+    for (let i = 0; i < epochAccount.fields.length; i++) {
+        const bn = epochAccount.fields[i];
+        if (bn.gt(max)) {
+            secondMax = max;
+            secondMaxIndex = maxIndex;
+            max = bn;
+            maxIndex = i;
+        } else if (bn.gt(secondMax)) {
+            secondMax = bn;
+            secondMaxIndex = i;
+        }
+    }
     const holderAccount = await getAccount(connection, holderAccountAddress);
     console.log(globalAccount);
     console.log(globalAccount.epoch.toString());
+
     const voteAccounts = await program.account.voteAccount.all([
         {
             memcmp: {
@@ -130,11 +182,16 @@ export async function collectDailyOgcData() {
             totalReserve: holderAccount.amount.toString(),
             totalReservers: voteAccounts.length.toString(),
             unlockableOgg: globalData.totalUnlockable,
-            lockedOgg: globalData.totalLocked
+            lockedOgg: globalData.totalLocked,
         }
     })
     await prisma.ogcGlobalData.update({
         where: { id: 0 },
-        data: { index: globalData.index + 1 }
+        data: {
+            index: globalData.index + 1,
+            lastWinningReserves: {
+                push: secondMaxIndex
+            }
+        }
     })
 }

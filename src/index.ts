@@ -5,7 +5,7 @@ import { PrismaClient } from "@prisma/client";
 import express from "express";
 import cors from "cors";
 import { collect as collectOgg, repurchaseOgg, uniqueWallets } from "./ogg";
-import { collect as collectOgc, collectDailyOgcData, repurchaseOgc } from "./ogc";
+import { collect as collectOgc, collectDailyOgcData, repurchaseOgc, test } from "./ogc";
 import bs58 from "bs58";
 import { Keypair } from "@solana/web3.js";
 
@@ -59,7 +59,7 @@ app.get("/ogc-data", async (req, res) => {
     }
 })
 async function main() {
-    // console.log(bs58.encode(Keypair.generate().secretKey));
+    // await test();
 }
 main().then(() => console.log("DONE"));
 work();
