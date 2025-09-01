@@ -34,6 +34,20 @@ model TopClaimedOgc {
   claimed String
 }
 
+model TopClaimedOgf {
+  wallet   String @id
+  claimed  Int    @default(0)
+  timesBid Int    @default(0)
+}
+
+model OgfDailyData {
+  id                  Int @id @default(autoincrement())
+  totalBids           Int
+  totalPoolSize       Int
+  totalUnreleasedOgf  Int
+  totalRepurchasedOgf Int
+}
+
 model IncrementalDataStepOgc {
   id             Int    @id
   dailyOgcReward String

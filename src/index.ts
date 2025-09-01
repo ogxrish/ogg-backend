@@ -8,6 +8,7 @@ import { collect as collectOgg, repurchaseOgg, uniqueWallets } from "./ogg";
 import { collect as collectOgc, collectDailyOgcData, repurchaseOgc, test } from "./ogc";
 import bs58 from "bs58";
 import { Keypair } from "@solana/web3.js";
+import { collectDailyOgfData, collectOgfLeaderboard, repurchaseOgf } from "./ogf";
 
 const app = express();
 app.use(cors());
@@ -59,6 +60,22 @@ app.get("/ogc-data", async (req, res) => {
         return res.status(500).json({ error: "Internal server error" });
     }
 })
+app.get("/ogf-data", async (req, res) => {
+    try {
+        const data = await prisma.ogfDailyData.findMany({
+            orderBy: { id: "asc" },
+            take: 200
+        });
+        const leaderboard = await prisma.topClaimedOgf.findMany({
+            orderBy: { claimed: "desc" },
+            take: 10,
+        })
+        return res.status(200).json({ data, leaderboard })
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+})
 async function main() {
     // await test();
 }
@@ -69,11 +86,19 @@ async function work() {
         await repurchaseOgc();
     } catch (e) {
         console.error(e);
+        console.error("Error repurchasing ogc")
     }
     try {
         await repurchaseOgg();
     } catch (e) {
         console.error(e);
+        console.error("Error repurchasing ogg")
+    }
+    try {
+        await repurchaseOgf()
+    } catch (e) {
+        console.error(e)
+        console.error("Error repurchasing ogf")
     }
     schedule(work);
 }
@@ -92,13 +117,25 @@ cron.schedule('50 23 * * *', async () => {
         console.error("Failed to get unique wallets");
     }
 }, { timezone: "UTC" });
+
 cron.schedule("*/15 * * * *", async () => {
     try {
         await collectOgc();
     } catch (e) {
         console.error(e);
+        console.error("Error collecting ogc leaderboard")
     }
 }, { timezone: "UTC" })
+
+cron.schedule("*/15 * * * *", async () => {
+    try {
+        await collectOgfLeaderboard();
+    } catch (e) {
+        console.error(e);
+        console.error("Error collecting ogf leaderboard")
+    }
+}, { timezone: "UTC" })
+
 cron.schedule('0 1 * * *', async () => {
     try {
         await collectOgg();
@@ -108,6 +145,15 @@ cron.schedule('0 1 * * *', async () => {
         console.error("Failed to collect data");
     }
 }, { timezone: "UTC" });
+
+cron.schedule('0 1 * * * ', async () => {
+    try {
+        await collectDailyOgfData()
+    } catch (e) {
+        console.error(e)
+        console.error("Failed to collect ogf data")
+    }
+}, { timezone: "UTC" })
 
 app.listen(process.env.PORT || 3001, async () => {
     console.log(`Server listening on ${process.env.PORT || 3001}`);
