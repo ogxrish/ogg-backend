@@ -9,17 +9,17 @@ import { prisma } from ".";
 const idl = require("../ogf/ogf_lottery.json")
 
 dotenv.config()
-const ogfAddress: string = "TODO";
+const ogfAddress: string = "EQyRaajDZLEEdSrU8Hws29LWjDJczGKB1CV6jrWcZJn9";
 const ogfTokenDecimals: number = 6
 const connection = new Connection(process.env.RPC_URL)
-const keypair = Keypair.fromSecretKey(bs58.decode(process.env.OGF_WALLET!))
+const keypair = Keypair.fromSecretKey(bs58.decode(process.env.OGG_WALLET!))
 const wallet = new Wallet(keypair)
 const provider = new AnchorProvider(connection, wallet, AnchorProvider.defaultOptions());
 const program = new Program<OgfLottery>(idl, provider)
 const MIN_BALANCE = 0.1 * LAMPORTS_PER_SOL;
 
 // TODO: Deploy program so this works
-program.addEventListener("claimEvent" as any, async (data) => {
+program.addEventListener("claimEvent", async (data) => {
     await prisma.topClaimedOgf.upsert({
         where: { wallet: data.user.toString() },
         update: {

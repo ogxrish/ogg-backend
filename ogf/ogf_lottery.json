@@ -1,5 +1,5 @@
 {
-  "address": "4m3mXCycberAPBPDWJEsejEMPy48Abfs8Hk5sp5ofmX5",
+  "address": "9mbMb3Tk3Z7NWZW3zBuCm3tk5XShge4EjRzhZgEGFDGr",
   "metadata": {
     "name": "ogf_lottery",
     "version": "0.1.0",
@@ -844,6 +844,21 @@
       ]
     }
   ],
+  "events": [
+    {
+      "name": "ClaimEvent",
+      "discriminator": [
+        93,
+        15,
+        70,
+        170,
+        48,
+        140,
+        212,
+        219
+      ]
+    }
+  ],
   "errors": [
     {
       "code": 6000,
@@ -906,6 +921,22 @@
           },
           {
             "name": "time",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ClaimEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
             "type": "u64"
           }
         ]

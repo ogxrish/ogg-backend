@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/ogf_lottery.json`.
  */
 export type OgfLottery = {
-  "address": "4m3mXCycberAPBPDWJEsejEMPy48Abfs8Hk5sp5ofmX5",
+  "address": "9mbMb3Tk3Z7NWZW3zBuCm3tk5XShge4EjRzhZgEGFDGr",
   "metadata": {
     "name": "ogfLottery",
     "version": "0.1.0",
@@ -850,6 +850,21 @@ export type OgfLottery = {
       ]
     }
   ],
+  "events": [
+    {
+      "name": "claimEvent",
+      "discriminator": [
+        93,
+        15,
+        70,
+        170,
+        48,
+        140,
+        212,
+        219
+      ]
+    }
+  ],
   "errors": [
     {
       "code": 6000,
@@ -912,6 +927,22 @@ export type OgfLottery = {
           },
           {
             "name": "time",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "claimEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
             "type": "u64"
           }
         ]
