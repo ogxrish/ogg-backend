@@ -78,6 +78,7 @@ export async function swapTransaction(wallet: Keypair, connection: Connection, i
     if (!swapTransaction) {
         console.log("Could not find route for coin: ", tokenAddress)
         console.log(`QuoteResponse: ${quoteResponse}`)
+        return
     }
     const swapTransactionBuf = Buffer.from(swapTransaction, 'base64');
     var transaction = VersionedTransaction.deserialize(swapTransactionBuf);
