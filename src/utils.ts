@@ -60,10 +60,11 @@ export async function depositOggTransaction(program: Program, wallet: Keypair) {
 const SOL = "So11111111111111111111111111111111111111112";
 export async function swapTransaction(wallet: Keypair, connection: Connection, inAmount: number, tokenAddress: string) {
     const quoteResponse = await (
-        await fetch(`https://quote-api.jup.ag/v6/quote?inputMint=${SOL}&outputMint=${tokenAddress}&amount=${inAmount}&slippageBps=50`)
+        await fetch(`https://lite-api.jup.ag/swap/v1/quote?inputMint=${SOL}&outputMint=${tokenAddress}&amount=${inAmount}&slippageBps=50`)
     ).json();
-    const { swapTransaction } = await (
-        await fetch('https://quote-api.jup.ag/v6/swap', {
+    console.log(quoteResponse)
+    const response = await (
+        await fetch('https://lite-api.jup.ag/swap/v1/swap', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -75,7 +76,8 @@ export async function swapTransaction(wallet: Keypair, connection: Connection, i
             })
         })
     ).json();
-    const swapTransactionBuf = Buffer.from(swapTransaction, 'base64');
+    console.log(response)
+    const swapTransactionBuf = Buffer.from(response, 'base64');
     var transaction = VersionedTransaction.deserialize(swapTransactionBuf);
     // sign the transaction
     transaction.sign([wallet]);
