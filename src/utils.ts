@@ -62,8 +62,7 @@ export async function swapTransaction(wallet: Keypair, connection: Connection, i
     const quoteResponse = await (
         await fetch(`https://lite-api.jup.ag/swap/v1/quote?inputMint=${SOL}&outputMint=${tokenAddress}&amount=${inAmount}&slippageBps=50`)
     ).json();
-    console.log(quoteResponse)
-    const response = await (
+    const { swapTransaction } = await (
         await fetch('https://lite-api.jup.ag/swap/v1/swap', {
             method: 'POST',
             headers: {
@@ -76,8 +75,11 @@ export async function swapTransaction(wallet: Keypair, connection: Connection, i
             })
         })
     ).json();
-    console.log(response)
-    const swapTransactionBuf = Buffer.from(response, 'base64');
+    if (!swapTransaction) {
+        console.log("Could not find route for coin: ", tokenAddress)
+        console.log(`QuoteResponse: ${quoteResponse}`)
+    }
+    const swapTransactionBuf = Buffer.from(swapTransaction, 'base64');
     var transaction = VersionedTransaction.deserialize(swapTransactionBuf);
     // sign the transaction
     transaction.sign([wallet]);
