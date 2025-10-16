@@ -65,6 +65,7 @@ export async function repurchaseOgf() {
     }
 }
 let lastPool: { index: number, bids: number } = { index: -1, bids: 0 };
+const DECREASE_FACTOR = 10 ** 6;
 export async function collectDailyOgfData() {
     const [globalDataAccountAddress] = PublicKey.findProgramAddressSync(
         [Buffer.from("global")],
@@ -87,12 +88,16 @@ export async function collectDailyOgfData() {
     } else {
         totalBids = currentPool.bids
     }
+    const totalPoolSize = Number(currentPool.balance.divn(10 ** ogfTokenDecimals).toString())
+    const totalUnreleasedOgf = Number((holderAccount.amount / BigInt(10 ** ogfTokenDecimals)))
+    const totalRepurchasedOgf = Number(depositAmount.divn(10 ** ogfTokenDecimals).toString())
+    console.log({ totalBids, totalPoolSize, totalRepurchasedOgf, totalUnreleasedOgf })
     await prisma.ogfDailyData.create({
         data: {
             totalBids,
-            totalPoolSize: Number(currentPool.balance.divn(10 ** ogfTokenDecimals).toString()),
-            totalUnreleasedOgf: Number((holderAccount.amount / BigInt(10 ** ogfTokenDecimals))),
-            totalRepurchasedOgf: Number(depositAmount.divn(10 ** ogfTokenDecimals).toString()),
+            totalPoolSize: totalPoolSize / DECREASE_FACTOR,
+            totalUnreleasedOgf: totalUnreleasedOgf / DECREASE_FACTOR,
+            totalRepurchasedOgf: totalRepurchasedOgf / DECREASE_FACTOR,
         }
     })
     lastPool = { index: currentPool.id, bids: currentPool.bids }

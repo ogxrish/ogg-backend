@@ -76,8 +76,9 @@ app.get("/ogf-data", async (req, res) => {
         return res.status(500).json({ error: "Internal server error" });
     }
 })
+
 async function main() {
-    // await test();
+    // collectDailyOgfData()
 }
 main().then(() => console.log("DONE"));
 work();
