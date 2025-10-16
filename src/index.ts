@@ -77,9 +77,9 @@ app.get("/ogf-data", async (req, res) => {
     }
 })
 
-// async function main() {
-//     repurchaseOgf();
-// }
+async function main() {
+    //     repurchaseOgf();
+}
 main().then(() => console.log("DONE"));
 work();
 async function work() {
