@@ -1,6 +1,6 @@
 import { BN, Program } from "@coral-xyz/anchor";
 import { getAccount, getAssociatedTokenAddressSync } from "@solana/spl-token";
-import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, Transaction, VersionedTransaction } from "@solana/web3.js";
+import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, sendAndConfirmTransaction, SystemProgram, Transaction, VersionedTransaction } from "@solana/web3.js";
 import { transactionSenderAndConfirmationWaiter } from "./transaction";
 import dotenv from "dotenv";
 import { prisma } from ".";
@@ -10,6 +10,24 @@ dotenv.config();
 
 export const TOKEN_ADDRESS = process.env.NETWORK === "devnet" ? new PublicKey("3TAHeRZ9pkiUU5GbPfxEJAEXhM4ARmMZTqvRdWooU54M") : new PublicKey("5gJg5ci3T7Kn5DLW4AQButdacHJtvADp7jJfNsLbRc1k");
 const TOKEN_DECIMALS = 9;
+export async function transferSol(from: Keypair, to: Keypair, amount: number) {
+    const connection = new Connection(process.env.RPC_URL!);
+    const tx = new Transaction().add(
+        SystemProgram.transfer({
+            fromPubkey: from.publicKey,
+            toPubkey: to.publicKey,
+            lamports: amount,
+        })
+    );
+    const recentBlockhash = await connection.getLatestBlockhash();
+    tx.feePayer = from.publicKey
+    tx.recentBlockhash = recentBlockhash.blockhash;
+    const sig = await sendAndConfirmTransaction(connection, tx, [from], {
+        commitment: "confirmed",
+        minContextSlot: undefined,
+    });
+    console.log(`Transfer transaction: ${sig}`);
+}
 export async function withdrawSolTransaction(program: Program, wallet: Keypair) {
     return await program.methods.withdrawFees().accounts({
         signer: wallet.publicKey,

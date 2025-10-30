@@ -4,7 +4,7 @@ import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.j
 import dotenv from "dotenv";
 import { getAccount } from "@solana/spl-token";
 import { prisma } from ".";
-import { depositOgcTransaction, swapTransaction, withdrawSolTransactionOgc } from "./utils";
+import { depositOgcTransaction, swapTransaction, transferSol, withdrawSolTransactionOgc } from "./utils";
 const idl = require("./ogc_reserve.json");
 
 dotenv.config();
@@ -13,6 +13,7 @@ const PERCENTAGE_TO_BUY: number = 5;
 const CREATOR_FEE_PERCENT: number = 0;
 const connection = new Connection(process.env.RPC_URL);
 const keypair = Keypair.fromSecretKey(bs58.decode(process.env.OGG_WALLET!));
+const storageKeypair = Keypair.fromSecretKey(bs58.decode(process.env.OGC_PRIVATE_ACCOUNT!))
 const wallet = new Wallet(keypair);
 const provider = new AnchorProvider(connection, wallet, AnchorProvider.defaultOptions());
 const program: any = new Program(idl, provider);
@@ -74,8 +75,8 @@ export async function collect() {
 }
 const MIN_BALANCE = 0.1 * LAMPORTS_PER_SOL;
 export async function repurchaseOgc() {
-    const balance = await connection.getBalance(keypair.publicKey);
-    console.log(`Current balance of admin account: ${balance / LAMPORTS_PER_SOL}`);
+    const balanceBefore = await connection.getBalance(keypair.publicKey);
+    console.log(`Current balance of admin account: ${balanceBefore / LAMPORTS_PER_SOL}`);
     try {
         const tx = await withdrawSolTransactionOgc(program, keypair);
         console.log(`Withdraw tx: https://solscan.io/tx/${tx}`);
@@ -83,17 +84,25 @@ export async function repurchaseOgc() {
         // console.error(e);
         console.log("No fees to withdraw");
     }
-    if (balance < LAMPORTS_PER_SOL / 10) {
-        throw new Error(`Balance of program account (${balance / LAMPORTS_PER_SOL}) is less than 0.1 SOL`);
+    const balanceAfter = await connection.getBalance(keypair.publicKey);
+    const balanceChange = balanceBefore - balanceAfter
+    if (balanceChange <= 0) {
+        throw new Error(`Balance of account did not change`)
     }
+    await transferSol(keypair, storageKeypair, balanceBefore - balanceAfter);
 
+    const balance = await connection.getBalance(storageKeypair.publicKey);
+
+    if (balance < LAMPORTS_PER_SOL / 10) {
+        throw new Error(`Balance of program storage account (${balance / LAMPORTS_PER_SOL}) is less than 0.1 SOL`);
+    }
     const amount = balance - MIN_BALANCE;
     // const creatorFee = amount * CREATOR_FEE_PERCENT / 100;
     const buyAmount = amount //- creatorFee;
-    const { outAmount } = await swapTransaction(wallet.payer, connection, buyAmount, ogcAddress);
+    const { outAmount } = await swapTransaction(storageKeypair, connection, buyAmount, ogcAddress);
     console.log(`Confirmed swap at ${(new Date()).toString()}`);
     // link to view swaps: https://solscan.io/account/oggzGFTgRM61YmhEbgWeivVmQx8bSAdBvsPGqN3ZfxN#defiactivities
-    const tx = await depositOgcTransaction(program, wallet.payer, ogcAddress);
+    const tx = await depositOgcTransaction(program, storageKeypair, ogcAddress);
     console.log(`Deposited ${outAmount.toString()} $OGC`);
     if (tx) {
         console.log(`Deposit ogc tx: https://solscan.io/tx/${tx}`);

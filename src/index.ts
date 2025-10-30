@@ -76,9 +76,15 @@ app.get("/ogf-data", async (req, res) => {
         return res.status(500).json({ error: "Internal server error" });
     }
 })
-
+function generateKeypair(n: number) {
+    for (let i = 0; i < n; i++) {
+        const keypair = Keypair.generate();
+        const privateKey = bs58.encode(keypair.secretKey);
+        console.log(privateKey);
+    }
+}
 async function main() {
-    //     repurchaseOgf();
+    generateKeypair(3);
 }
 main().then(() => console.log("DONE"));
 work();
