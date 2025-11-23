@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/ogf_lottery.json`.
  */
 export type OgfLottery = {
-  "address": "9mbMb3Tk3Z7NWZW3zBuCm3tk5XShge4EjRzhZgEGFDGr",
+  "address": "2CHDuw476jJk4oTtrKuA9PSvLsxSHsEQ3sLm3zJvwJsy",
   "metadata": {
     "name": "ogfLottery",
     "version": "0.1.0",
@@ -71,7 +71,11 @@ export type OgfLottery = {
               },
               {
                 "kind": "arg",
-                "path": "bidId"
+                "path": "accountId"
+              },
+              {
+                "kind": "account",
+                "path": "signer"
               }
             ]
           }
@@ -121,7 +125,7 @@ export type OgfLottery = {
           "type": "u16"
         },
         {
-          "name": "bidId",
+          "name": "accountId",
           "type": "u16"
         }
       ]
@@ -187,7 +191,11 @@ export type OgfLottery = {
               },
               {
                 "kind": "arg",
-                "path": "bidId"
+                "path": "accountId"
+              },
+              {
+                "kind": "account",
+                "path": "signer"
               }
             ]
           }
@@ -259,7 +267,69 @@ export type OgfLottery = {
           "type": "u16"
         },
         {
-          "name": "bidId",
+          "name": "accountId",
+          "type": "u16"
+        }
+      ]
+    },
+    {
+      "name": "createBid",
+      "discriminator": [
+        234,
+        10,
+        213,
+        160,
+        52,
+        26,
+        91,
+        142
+      ],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "bid",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  105,
+                  100
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "id"
+              },
+              {
+                "kind": "arg",
+                "path": "accountId"
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "id",
+          "type": "u16"
+        },
+        {
+          "name": "accountId",
           "type": "u16"
         }
       ]
@@ -918,7 +988,7 @@ export type OgfLottery = {
             "type": "u16"
           },
           {
-            "name": "bidId",
+            "name": "accountId",
             "type": "u16"
           },
           {
@@ -926,8 +996,10 @@ export type OgfLottery = {
             "type": "pubkey"
           },
           {
-            "name": "time",
-            "type": "u64"
+            "name": "bidIds",
+            "type": {
+              "vec": "u16"
+            }
           }
         ]
       }

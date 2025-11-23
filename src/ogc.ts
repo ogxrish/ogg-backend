@@ -81,14 +81,15 @@ export async function repurchaseOgc() {
         const tx = await withdrawSolTransactionOgc(program, keypair);
         console.log(`Withdraw tx: https://solscan.io/tx/${tx}`);
     } catch (e) {
-        // console.error(e);
-        console.log("No fees to withdraw");
+        console.error(e);
     }
     const balanceAfter = await connection.getBalance(keypair.publicKey);
     const balanceChange = balanceBefore - balanceAfter
     if (balanceChange <= 0) {
-        throw new Error(`Balance of account did not change`)
+        console.log("Balance of account did not change, returning")
+        return
     }
+
     await transferSol(keypair, storageKeypair, balanceBefore - balanceAfter);
 
     const balance = await connection.getBalance(storageKeypair.publicKey);

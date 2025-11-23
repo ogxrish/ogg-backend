@@ -8,3 +8,4 @@ env
 *.png
 # do not commit backups
 data-*.json
+scripts/output-bs58.ts

@@ -12,7 +12,7 @@ dotenv.config()
 const ogfAddress: string = "EQyRaajDZLEEdSrU8Hws29LWjDJczGKB1CV6jrWcZJn9";
 const ogfTokenDecimals: number = 6
 const connection = new Connection(process.env.RPC_URL)
-const keypair = Keypair.fromSecretKey(bs58.decode(process.env.OGG_WALLET!))
+const keypair = Keypair.fromSecretKey(bs58.decode(process.env.OGF_WALLET!))
 const wallet = new Wallet(keypair)
 const provider = new AnchorProvider(connection, wallet, AnchorProvider.defaultOptions());
 const program = new Program<OgfLottery>(idl, provider)
@@ -102,23 +102,4 @@ export async function collectDailyOgfData() {
     })
     lastPool = { index: currentPool.id, bids: currentPool.bids }
     depositAmount = new BN(0)
-}
-
-export async function collectOgfLeaderboard() {
-    const cutoffTime = new BN(Date.now() / 1000 - 3600)
-    let bids = await program.account.bidAccount.all()
-    bids = bids.filter(b => b.account.time.gt(cutoffTime))
-    for (const bid of bids) {
-        await prisma.topClaimedOgf.upsert({
-            where: { wallet: bid.account.bidder.toString() },
-            update: {
-                timesBid: { increment: 1 },
-            },
-            create: {
-                wallet: bid.account.bidder.toString(),
-                timesBid: 1,
-                claimed: 0
-            }
-        })
-    }
 }

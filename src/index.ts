@@ -8,7 +8,7 @@ import { collect as collectOgg, repurchaseOgg, uniqueWallets } from "./ogg";
 import { collect as collectOgc, collectDailyOgcData, repurchaseOgc, test } from "./ogc";
 import bs58 from "bs58";
 import { Keypair } from "@solana/web3.js";
-import { collectDailyOgfData, collectOgfLeaderboard, repurchaseOgf } from "./ogf";
+import { collectDailyOgfData, repurchaseOgf } from "./ogf";
 
 const app = express();
 app.use(cors());
@@ -84,31 +84,31 @@ function generateKeypair(n: number) {
     }
 }
 async function main() {
-    generateKeypair(3);
+    await repurchaseOgf();
 }
 main().then(() => console.log("DONE"));
-work();
-async function work() {
-    try {
-        await repurchaseOgc();
-    } catch (e) {
-        console.error(e);
-        console.error("Error repurchasing ogc")
-    }
-    try {
-        await repurchaseOgg();
-    } catch (e) {
-        console.error(e);
-        console.error("Error repurchasing ogg")
-    }
-    try {
-        await repurchaseOgf()
-    } catch (e) {
-        console.error(e)
-        console.error("Error repurchasing ogf")
-    }
-    schedule(work);
-}
+// work();
+// async function work() {
+//     try {
+//         await repurchaseOgc();
+//     } catch (e) {
+//         console.error(e);
+//         console.error("Error repurchasing ogc")
+//     }
+//     try {
+//         await repurchaseOgg();
+//     } catch (e) {
+//         console.error(e);
+//         console.error("Error repurchasing ogg")
+//     }
+//     try {
+//         await repurchaseOgf()
+//     } catch (e) {
+//         console.error(e)
+//         console.error("Error repurchasing ogf")
+//     }
+//     schedule(work);
+// }
 const MIN_INTERVAL = 1000 * 1000; // in ms
 const MAX_INTERVAL = 5000 * 1000; // ms
 export function schedule(f: () => any) {
@@ -131,15 +131,6 @@ cron.schedule("*/15 * * * *", async () => {
     } catch (e) {
         console.error(e);
         console.error("Error collecting ogc leaderboard")
-    }
-}, { timezone: "UTC" })
-
-cron.schedule("*/15 * * * *", async () => {
-    try {
-        await collectOgfLeaderboard();
-    } catch (e) {
-        console.error(e);
-        console.error("Error collecting ogf leaderboard")
     }
 }, { timezone: "UTC" })
 

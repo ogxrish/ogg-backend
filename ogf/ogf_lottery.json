@@ -1,5 +1,5 @@
 {
-  "address": "9mbMb3Tk3Z7NWZW3zBuCm3tk5XShge4EjRzhZgEGFDGr",
+  "address": "2CHDuw476jJk4oTtrKuA9PSvLsxSHsEQ3sLm3zJvwJsy",
   "metadata": {
     "name": "ogf_lottery",
     "version": "0.1.0",
@@ -65,7 +65,11 @@
               },
               {
                 "kind": "arg",
-                "path": "bid_id"
+                "path": "account_id"
+              },
+              {
+                "kind": "account",
+                "path": "signer"
               }
             ]
           }
@@ -115,7 +119,7 @@
           "type": "u16"
         },
         {
-          "name": "bid_id",
+          "name": "account_id",
           "type": "u16"
         }
       ]
@@ -181,7 +185,11 @@
               },
               {
                 "kind": "arg",
-                "path": "bid_id"
+                "path": "account_id"
+              },
+              {
+                "kind": "account",
+                "path": "signer"
               }
             ]
           }
@@ -253,7 +261,69 @@
           "type": "u16"
         },
         {
-          "name": "bid_id",
+          "name": "account_id",
+          "type": "u16"
+        }
+      ]
+    },
+    {
+      "name": "create_bid",
+      "discriminator": [
+        234,
+        10,
+        213,
+        160,
+        52,
+        26,
+        91,
+        142
+      ],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "bid",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  105,
+                  100
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "id"
+              },
+              {
+                "kind": "arg",
+                "path": "account_id"
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "id",
+          "type": "u16"
+        },
+        {
+          "name": "account_id",
           "type": "u16"
         }
       ]
@@ -912,7 +982,7 @@
             "type": "u16"
           },
           {
-            "name": "bid_id",
+            "name": "account_id",
             "type": "u16"
           },
           {
@@ -920,8 +990,10 @@
             "type": "pubkey"
           },
           {
-            "name": "time",
-            "type": "u64"
+            "name": "bid_ids",
+            "type": {
+              "vec": "u16"
+            }
           }
         ]
       }
