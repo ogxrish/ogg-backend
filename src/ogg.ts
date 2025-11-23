@@ -32,7 +32,8 @@ export async function repurchaseOgg() {
         console.log("No fees to withdraw");
     }
     if (balance < LAMPORTS_PER_SOL / 10) {
-        throw new Error(`Balance of program account (${balance / LAMPORTS_PER_SOL}) is less than 0.1 SOL`);
+        console.log(`Balance of program account (${balance / LAMPORTS_PER_SOL}) is less than 0.1 SOL`);
+        return
     }
     const amount = balance - MIN_BALANCE;
     // const creatorFee = amount * CREATOR_FEE_PERCENT / 100;

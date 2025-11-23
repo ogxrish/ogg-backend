@@ -87,28 +87,28 @@ async function main() {
     await repurchaseOgf();
 }
 main().then(() => console.log("DONE"));
-// work();
-// async function work() {
-//     try {
-//         await repurchaseOgc();
-//     } catch (e) {
-//         console.error(e);
-//         console.error("Error repurchasing ogc")
-//     }
-//     try {
-//         await repurchaseOgg();
-//     } catch (e) {
-//         console.error(e);
-//         console.error("Error repurchasing ogg")
-//     }
-//     try {
-//         await repurchaseOgf()
-//     } catch (e) {
-//         console.error(e)
-//         console.error("Error repurchasing ogf")
-//     }
-//     schedule(work);
-// }
+work();
+async function work() {
+    try {
+        await repurchaseOgc();
+    } catch (e) {
+        console.error(e);
+        console.error("Error repurchasing ogc")
+    }
+    try {
+        await repurchaseOgg();
+    } catch (e) {
+        console.error(e);
+        console.error("Error repurchasing ogg")
+    }
+    try {
+        await repurchaseOgf()
+    } catch (e) {
+        console.error(e)
+        console.error("Error repurchasing ogf")
+    }
+    schedule(work);
+}
 const MIN_INTERVAL = 1000 * 1000; // in ms
 const MAX_INTERVAL = 5000 * 1000; // ms
 export function schedule(f: () => any) {

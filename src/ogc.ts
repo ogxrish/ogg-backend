@@ -84,11 +84,6 @@ export async function repurchaseOgc() {
         console.error(e);
     }
     const balanceAfter = await connection.getBalance(keypair.publicKey);
-    const balanceChange = balanceBefore - balanceAfter
-    if (balanceChange <= 0) {
-        console.log("Balance of account did not change, returning")
-        return
-    }
 
     await transferSol(keypair, storageKeypair, balanceBefore - balanceAfter);
 
